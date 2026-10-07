@@ -13,27 +13,41 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <TelerikGrid Data="@forecasts"
+                 Sortable="true"
+                 FilterMode="GridFilterMode.FilterRow"
+                 Pageable="true"
+                 PageSize="10">
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Title="Date" DisplayFormat="{0:d}" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" Title="Temp. (C)" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Title="Temp. (F)" />
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Title="Summary" />
+        </GridColumns>
+    </TelerikGrid>
+
+    <TelerikChart>
+        <ChartSeriesItems>
+            <ChartSeries Type="ChartSeriesType.Line"
+                         Name="Temp. (C)"
+                         Data="@forecasts"
+                         Field="@nameof(WeatherForecast.TemperatureC)"
+                         CategoryField="@nameof(WeatherForecast.Date)" />
+            <ChartSeries Type="ChartSeriesType.Line"
+                         Name="Temp. (F)"
+                         Data="@forecasts"
+                         Field="@nameof(WeatherForecast.TemperatureF)"
+                         CategoryField="@nameof(WeatherForecast.Date)" />
+        </ChartSeriesItems>
+
+        <ChartTitle Text="Temperature Trend" />
+
+        <ChartCategoryAxes>
+            <ChartCategoryAxis Type="ChartCategoryAxisType.Date" BaseUnit="ChartCategoryAxisBaseUnit.Days" />
+        </ChartCategoryAxes>
+
+        <ChartLegend Position="ChartLegendPosition.Bottom" />
+    </TelerikChart>
 }
 
 @code {
@@ -46,7 +60,7 @@ else
 
         var startDate = DateOnly.FromDateTime(DateTime.Now);
         var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        forecasts = Enumerable.Range(1, 14).Select(index => new WeatherForecast
         {
             Date = startDate.AddDays(index),
             TemperatureC = Random.Shared.Next(-20, 55),
